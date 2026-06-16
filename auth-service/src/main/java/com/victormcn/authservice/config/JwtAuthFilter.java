@@ -1,9 +1,10 @@
 package com.victormcn.authservice.config;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -38,9 +39,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
-
-        System.out.println("HEADER: " + authHeader);
+        String authHeader =
+                request.getHeader("Authorization");
 
         if (authHeader == null ||
                 !authHeader.startsWith("Bearer ")) {
@@ -49,35 +49,35 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = authHeader.substring(7);
-
-        System.out.println("TOKEN: " + token);
+        String token =
+                authHeader.substring(7);
 
         if (!jwtUtil.validarToken(token)) {
-
-            System.out.println("TOKEN INVÁLIDO");
 
             filterChain.doFilter(request, response);
             return;
         }
 
-        String username = jwtUtil.extrairUsername(token);
+        String username =
+                jwtUtil.extrairUsername(token);
 
-        System.out.println("USERNAME EXTRAÍDO: " + username);
+        String role =
+                jwtUtil.extrairRole(token);
 
-        Usuario usuario = usuarioService
-                .buscarPorUsername(username)
-                .orElse(null);
+        Usuario usuario =
+                usuarioService
+                        .buscarPorUsername(username)
+                        .orElse(null);
 
         if (usuario != null) {
-
-            System.out.println("USUÁRIO ENCONTRADO");
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
                             username,
                             null,
-                            Collections.emptyList());
+                            List.of(
+                                    new SimpleGrantedAuthority(
+                                            "ROLE_" + role)));
 
             authentication.setDetails(
                     new WebAuthenticationDetailsSource()

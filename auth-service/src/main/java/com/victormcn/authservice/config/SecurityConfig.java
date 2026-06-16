@@ -18,7 +18,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http)
             throws Exception {
 
         http
@@ -31,10 +32,14 @@ public class SecurityConfig {
                                 SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
+
                         .requestMatchers(
                                 "/auth/**",
                                 "/h2-console/**")
                         .permitAll()
+
+                        .requestMatchers("/usuarios/**")
+                        .hasRole("ADMIN")
 
                         .anyRequest()
                         .authenticated())
