@@ -1,76 +1,60 @@
 package com.victormcn.academicservice.service;
 
 import java.util.List;
-
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
-
 import com.victormcn.academicservice.dto.MatriculaRequest;
 import com.victormcn.academicservice.dto.MatriculaResponse;
-import com.victormcn.academicservice.model.Aluno;
 import com.victormcn.academicservice.model.Matricula;
-import com.victormcn.academicservice.model.Turma;
-import com.victormcn.academicservice.repository.AlunoRepository;
 import com.victormcn.academicservice.repository.MatriculaRepository;
-import com.victormcn.academicservice.repository.TurmaRepository;
 
 @Service
 public class MatriculaService {
 
     private final MatriculaRepository matriculaRepository;
-    private final AlunoRepository alunoRepository;
-    private final TurmaRepository turmaRepository;
 
-    public MatriculaService(
-            MatriculaRepository matriculaRepository,
-            AlunoRepository alunoRepository,
-            TurmaRepository turmaRepository) {
-
+    public MatriculaService(MatriculaRepository matriculaRepository) {
         this.matriculaRepository = matriculaRepository;
-        this.alunoRepository = alunoRepository;
-        this.turmaRepository = turmaRepository;
     }
 
-    public MatriculaResponse salvar(
-            MatriculaRequest request) {
-
-        Aluno aluno =
-                alunoRepository.findById(
-                        request.getAlunoId())
-                        .orElseThrow();
-
-        Turma turma =
-                turmaRepository.findById(
-                        request.getTurmaId())
-                        .orElseThrow();
-
+    public MatriculaResponse salvar(MatriculaRequest request) {
         Matricula matricula = new Matricula();
-
-        matricula.setDataMatricula(
-                request.getDataMatricula());
-
-        matricula.setAluno(aluno);
-        matricula.setTurma(turma);
-
-        Matricula salva =
-                matriculaRepository.save(matricula);
-
-        return new MatriculaResponse(
-                salva.getId(),
-                salva.getDataMatricula(),
-                salva.getAluno().getId(),
-                salva.getTurma().getId());
+        matricula.setDataMatricula(request.getDataMatricula());
+        matricula.setAlunoId(request.getAlunoId());
+        matricula.setTurmaId(request.getTurmaId());
+        
+        Matricula salva = matriculaRepository.save(matricula);
+        return new MatriculaResponse(salva.getId(), salva.getDataMatricula(), salva.getAlunoId(), salva.getTurmaId());
     }
 
-    public List<MatriculaResponse> listarTodos() {
+    public List<MatriculaResponse> listarTodas() {
+        return matriculaRepository.findAll().stream()
+                .map(m -> new MatriculaResponse(m.getId(), m.getDataMatricula(), m.getAlunoId(), m.getTurmaId()))
+                .collect(Collectors.toList());
+    }
 
-        return matriculaRepository.findAll()
-                .stream()
-                .map(matricula ->
-                        new MatriculaResponse(
-                                matricula.getId(),
-                                matricula.getDataMatricula(),
-                                matricula.getAluno().getId(),
-                                matricula.getTurma().getId()))
-                .toList();
+    public List<MatriculaResponse> buscarPorAluno(Long alunoId) {
+        return matriculaRepository.findByAlunoId(alunoId).stream()
+                .map(m -> new MatriculaResponse(m.getId(), m.getDataMatricula(), m.getAlunoId(), m.getTurmaId()))
+                .collect(Collectors.toList());
+    }
+
+    public MatriculaResponse atualizar(Long id, MatriculaRequest request) {
+        Matricula matricula = matriculaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Matricula nao encontrada com o ID: " + id));
+        
+        matricula.setDataMatricula(request.getDataMatricula());
+        matricula.setAlunoId(request.getAlunoId());
+        matricula.setTurmaId(request.getTurmaId());
+        
+        Matricula atualizada = matriculaRepository.save(matricula);
+        return new MatriculaResponse(atualizada.getId(), atualizada.getDataMatricula(), atualizada.getAlunoId(), atualizada.getTurmaId());
+    }
+
+    public void deletar(Long id) {
+        if (!matriculaRepository.existsById(id)) {
+            throw new RuntimeException("Matricula nao encontrada com o ID: " + id);
+        }
+        matriculaRepository.deleteById(id);
     }
 }

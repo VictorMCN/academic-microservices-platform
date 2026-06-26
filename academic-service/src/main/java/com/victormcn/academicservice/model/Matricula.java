@@ -1,8 +1,13 @@
 package com.victormcn.academicservice.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "matriculas")
 public class Matricula {
 
     @Id
@@ -10,47 +15,48 @@ public class Matricula {
     private Long id;
 
     private String dataMatricula;
-
-    @ManyToOne
-    @JoinColumn(name = "aluno_id")
-    private Aluno aluno;
-
-    @ManyToOne
-    @JoinColumn(name = "turma_id")
-    private Turma turma;
+    private Long alunoId;
+    private Long turmaId;
 
     public Matricula() {
+    }
+
+    public Matricula(Long id, String dataMatricula, Long alunoId, Long turmaId) {
+        this.id = id;
+        this.dataMatricula = dataMatricula;
+        this.alunoId = alunoId;
+        this.turmaId = turmaId;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getDataMatricula() {
-        return dataMatricula;
-    }
-
-    public Aluno getAluno() {
-        return aluno;
-    }
-
-    public Turma getTurma() {
-        return turma;
-    }
-
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getDataMatricula() {
+        return dataMatricula;
     }
 
     public void setDataMatricula(String dataMatricula) {
         this.dataMatricula = dataMatricula;
     }
 
-    public void setAluno(Aluno aluno) {
-        this.aluno = aluno;
+    public Long getAlunoId() {
+        return alunoId;
     }
 
-    public void setTurma(Turma turma) {
-        this.turma = turma;
+    public void setAlunoId(Long alunoId) {
+        this.alunoId = alunoId;
+    }
+
+    public Long getTurmaId() {
+        return turmaId;
+    }
+
+    public void setTurmaId(Long turmaId) {
+        this.turmaId = turmaId;
     }
 }

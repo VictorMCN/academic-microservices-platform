@@ -1,9 +1,7 @@
 package com.victormcn.authservice.model;
 
 public enum Role {
-
-    ADMIN,
-    PROFESSOR,
-    ALUNO
-
+    ROLE_ADMIN,
+    ROLE_PROFESSOR,
+    ROLE_ALUNO
 }

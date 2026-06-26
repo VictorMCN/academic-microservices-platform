@@ -28,13 +28,13 @@ public class CursoService {
         curso.setNome(request.getNome());
         curso.setDescricao(request.getDescricao());
 
-        Curso cursoSalvo =
+        Curso salvo =
                 cursoRepository.save(curso);
 
         return new CursoResponse(
-                cursoSalvo.getId(),
-                cursoSalvo.getNome(),
-                cursoSalvo.getDescricao());
+                salvo.getId(),
+                salvo.getNome(),
+                salvo.getDescricao());
     }
 
     public List<CursoResponse> listarTodos() {
@@ -47,5 +47,46 @@ public class CursoService {
                                 curso.getNome(),
                                 curso.getDescricao()))
                 .toList();
+    }
+
+    public CursoResponse buscarPorId(Long id) {
+
+        Curso curso =
+                cursoRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Curso não encontrado"));
+
+        return new CursoResponse(
+                curso.getId(),
+                curso.getNome(),
+                curso.getDescricao());
+    }
+
+    public CursoResponse atualizar(
+            Long id,
+            CursoRequest request) {
+
+        Curso curso =
+                cursoRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Curso não encontrado"));
+
+        curso.setNome(request.getNome());
+        curso.setDescricao(request.getDescricao());
+
+        Curso atualizado =
+                cursoRepository.save(curso);
+
+        return new CursoResponse(
+                atualizado.getId(),
+                atualizado.getNome(),
+                atualizado.getDescricao());
+    }
+
+    public void deletar(Long id) {
+
+        cursoRepository.deleteById(id);
     }
 }

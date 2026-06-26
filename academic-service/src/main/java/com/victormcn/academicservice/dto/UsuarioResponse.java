@@ -1,17 +1,9 @@
-package com.victormcn.authservice.dto;
+package com.victormcn.academicservice.dto;
 
 public class UsuarioResponse {
     private Long id;
     private String nome;
     private String role;
-
-    public UsuarioResponse() {}
-
-    public UsuarioResponse(Long id, String nome, String role) {
-        this.id = id;
-        this.nome = nome;
-        this.role = role;
-    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
