@@ -1,4 +1,4 @@
-package com.victormcn.authservice.config;
+package com.victormcn.academicservice.config;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,24 +24,28 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
         String authHeader = request.getHeader("Authorization");
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
+
             if (jwtUtil.validarToken(token)) {
-                String nome = jwtUtil.extrairUsername(token);
+                String username = jwtUtil.extrairUsername(token);
                 String role = jwtUtil.extrairRole(token);
-                
+
                 if (role != null) {
-                    // Evita criar ROLE_ROLE_ADMIN limpando qualquer prefixo pré-existente
                     String cleanRole = role.toUpperCase().replace("ROLE_", "");
                     SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + cleanRole);
                     
                     UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(nome, token, List.of(authority));
+                            new UsernamePasswordAuthenticationToken(username, token, List.of(authority));
+
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
         }
+
         filterChain.doFilter(request, response);
     }
 }
